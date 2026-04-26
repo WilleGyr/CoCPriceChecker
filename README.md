@@ -10,15 +10,9 @@
 
 <br>
 
-[![Last Commit](https://img.shields.io/github/last-commit/WilleGyr/CoCPriceChecker?style=for-the-badge&color=f5a623&labelColor=1a2129)](https://github.com/WilleGyr/CoCPriceChecker/commits)
-[![Repo Size](https://img.shields.io/github/repo-size/WilleGyr/CoCPriceChecker?style=for-the-badge&color=58a6ff&labelColor=1a2129)](https://github.com/WilleGyr/CoCPriceChecker)
-[![Stars](https://img.shields.io/github/stars/WilleGyr/CoCPriceChecker?style=for-the-badge&color=f5a623&labelColor=1a2129)](https://github.com/WilleGyr/CoCPriceChecker/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3fb950?style=for-the-badge&labelColor=1a2129)](LICENSE)
-
 [![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-f7df1e?style=for-the-badge&logo=javascript&logoColor=black&labelColor=1a2129)](https://developer.mozilla.org/docs/Web/JavaScript)
-[![No Build](https://img.shields.io/badge/No_Build-Required-success?style=for-the-badge&labelColor=1a2129)](#-quick-start)
 [![No Deps](https://img.shields.io/badge/Dependencies-Zero-3fb950?style=for-the-badge&labelColor=1a2129)](#-tech-stack)
-[![Powered By Math](https://img.shields.io/badge/Powered_by-Math_💖-b794f4?style=for-the-badge&labelColor=1a2129)](#-how-it-works)
 
 </div>
 
