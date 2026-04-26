@@ -101,21 +101,21 @@ That's it. No `npm install`. No build step. No backend.
    - **Gem-pack** — bought with SEK, contents are gems
    - **Trader** — bought with gems (add `Gem` with a **negative** qty as the cost)
 3. Fill in price, date, contents
-4. Toggle `Aktiv` if it's currently in the shop, `Köpt` if you've bought it
+4. Toggle `Active in shop` if it's currently available, `Purchased by me` if you've bought it
 5. Save
 
 ### Reading the valuation
 
-Open the **Värdering** tab and click **Räkna om värdering**:
+Open the **Valuation** tab and click **Recompute valuation**:
 
-- **Värde per item** — estimated SEK value, sorted highest-first. The *Bundles* column shows how many equations the model used for that item — more = higher confidence.
-- **Deal-score per bundle** — every active bundle ranked by `value / price`:
+- **Value per item** — estimated SEK value, sorted highest-first. The *Bundles* column shows how many equations the model used for that item — more = higher confidence.
+- **Deal score per bundle** — every active bundle ranked by `value / price`:
   - `> 1.0x` → 🟢 good deal (you get more value than you pay)
   - `< 1.0x` → 🔴 overpriced
 
 ### Backup & restore
 
-Open the **Data** tab → **Exportera JSON**. All bundles export to one file you can import later or sync between devices.
+Open the **Data** tab → **Export JSON**. All bundles export to one file you can import later or sync between devices.
 
 ## 🛠️ Tech stack
 
