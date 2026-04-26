@@ -15,7 +15,7 @@ const ITEMS = [
 
   // Ores (no images yet)
   { id: 'starry_ore',            name: 'Starry Ore',            image: 'images/Icon_HV_Resource_Starry_Ore.png',         category: 'ore' },
-  { id: 'glowy_ore',             name: 'Glowy Ore',             image: null,                                             category: 'ore' },
+  { id: 'glowy_ore',             name: 'Glowy Ore',             image: 'images/Icon_HV_Resource_Glowy_Ore.png',          category: 'ore' },
   { id: 'shiny_ore',             name: 'Shiny Ore',             image: 'images/Icon_HV_Resource_Shiny_Ore.png',          category: 'ore' },
 
   // Magic items - books
