@@ -95,7 +95,7 @@ That's it. No `npm install`. No build step. No backend.
 
 ### Adding a bundle
 
-1. Click **+ Ny bundle**
+1. Click **+ New bundle**
 2. Pick the type:
    - **Shop** — bought with SEK, contents are what you receive
    - **Gem-pack** — bought with SEK, contents are gems
@@ -152,9 +152,7 @@ Open the **Data** tab → **Export JSON**. All bundles export to one file you ca
 
 PRs welcome! Particularly helpful:
 
-- 🖼️ **Missing item images** — Hero potion, Research potion, Clock tower potion
 - 🎁 **Bundle data** — new shop offers as they appear
-- 🌍 **Translations** — UI is currently English-only
 
 For larger changes, please open an issue first to discuss the approach.
 
