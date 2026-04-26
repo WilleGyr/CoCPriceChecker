@@ -146,13 +146,7 @@ Open the **Data** tab → **Export JSON**. All bundles export to one file you ca
 ## 🗺️ Roadmap
 
 - [ ] Hero potion / Research potion / Clock tower potion item images
-- [ ] Per-bundle "exclude from valuation" toggle (e.g. when a bundle is a clear outlier)
-- [ ] Date range — track when bundles appeared/disappeared from the shop
-- [ ] Confidence intervals on estimated values
-- [ ] Highlight which bundles drive the largest valuation changes when added
 - [ ] Multi-currency support (EUR, USD)
-- [ ] GitHub Pages deployment with shareable bundle library
-- [ ] Mobile-first responsive polish
 
 ## 🤝 Contributing
 
@@ -170,7 +164,7 @@ For larger changes, please open an issue first to discuss the approach.
 
 ## 🙏 Credits
 
-- Built by [@WilleGyr](https://github.com/WilleGyr) with [Claude Code](https://claude.com/claude-code)
+- Built by [William Gyrulf](https://github.com/WilleGyr)
 - All Clash of Clans item icons © Supercell — used here for personal/educational purposes only
 - This project is **not affiliated with, endorsed by, or sponsored by Supercell**
 
