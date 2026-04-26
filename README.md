@@ -165,9 +165,3 @@ For larger changes, please open an issue first to discuss the approach.
 - Built by [William Gyrulf](https://github.com/WilleGyr)
 - All Clash of Clans item icons © Supercell — used here for personal/educational purposes only
 - This project is **not affiliated with, endorsed by, or sponsored by Supercell**
-
----
-
-<div align="center">
-<sub>Made with too much regression and not enough sleep.</sub>
-</div>
