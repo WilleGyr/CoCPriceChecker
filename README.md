@@ -160,7 +160,7 @@ PRs welcome! Particularly helpful:
 
 - 🖼️ **Missing item images** — Hero potion, Research potion, Clock tower potion
 - 🎁 **Bundle data** — new shop offers as they appear
-- 🌍 **Translations** — currently the UI is in Swedish
+- 🌍 **Translations** — UI is currently English-only
 
 For larger changes, please open an issue first to discuss the approach.
 

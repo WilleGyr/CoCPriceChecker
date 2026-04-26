@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
     <h1>CoC Price Checker</h1>
     <nav class="tabs">
       <button class="tab active" data-tab="bundles">Bundles</button>
-      <button class="tab" data-tab="valuation">Värdering</button>
+      <button class="tab" data-tab="valuation">Valuation</button>
       <button class="tab" data-tab="items">Items</button>
       <button class="tab" data-tab="data">Data</button>
     </nav>
@@ -21,19 +21,19 @@
     <!-- BUNDLES TAB -->
     <section id="tab-bundles" class="tab-panel active">
       <div class="toolbar">
-        <button id="btn-new-bundle" class="primary">+ Ny bundle</button>
-        <input type="search" id="search-bundles" placeholder="Sök på namn eller item...">
+        <button id="btn-new-bundle" class="primary">+ New bundle</button>
+        <input type="search" id="search-bundles" placeholder="Search by name or item...">
         <select id="filter-type">
-          <option value="all">Alla typer</option>
+          <option value="all">All types</option>
           <option value="shop">Shop</option>
-          <option value="gem-pack">Gem-paket</option>
+          <option value="gem-pack">Gem pack</option>
           <option value="trader">Trader</option>
         </select>
         <select id="filter-status">
-          <option value="all">Alla</option>
-          <option value="active">Aktiva</option>
-          <option value="inactive">Inaktiva</option>
-          <option value="purchased">Köpta</option>
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="purchased">Purchased</option>
         </select>
       </div>
       <div id="bundles-list"></div>
@@ -42,22 +42,22 @@
     <!-- VALUATION TAB -->
     <section id="tab-valuation" class="tab-panel">
       <div class="toolbar">
-        <button id="btn-recalc" class="primary">Räkna om värdering</button>
+        <button id="btn-recalc" class="primary">Recompute valuation</button>
         <span id="valuation-status" class="muted"></span>
       </div>
       <div class="valuation-grid">
         <div class="card">
-          <h2>Uppskattat värde per item (SEK)</h2>
+          <h2>Estimated value per item (SEK)</h2>
           <table id="item-values-table">
-            <thead><tr><th></th><th>Item</th><th class="num">Värde</th><th class="num">Per</th><th class="num">Bundles</th></tr></thead>
+            <thead><tr><th></th><th>Item</th><th class="num">Value</th><th class="num">Per</th><th class="num">Bundles</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
         <div class="card">
-          <h2>Deal-score per bundle</h2>
-          <p class="muted small">Värde i SEK / pris. &gt; 1.0 = bra deal. För trader: värde av items / SEK-värde av gems-kostnad.</p>
+          <h2>Deal score per bundle</h2>
+          <p class="muted small">Value in SEK / price. &gt; 1.0 = good deal. For trader: item value / SEK value of gem cost.</p>
           <table id="bundle-scores-table">
-            <thead><tr><th>Bundle</th><th class="num">Pris</th><th class="num">Värde</th><th class="num">Score</th></tr></thead>
+            <thead><tr><th>Bundle</th><th class="num">Price</th><th class="num">Value</th><th class="num">Score</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -67,7 +67,7 @@
     <!-- ITEMS TAB -->
     <section id="tab-items" class="tab-panel">
       <div class="toolbar">
-        <input type="search" id="search-items" placeholder="Sök item...">
+        <input type="search" id="search-items" placeholder="Search items...">
       </div>
       <div id="items-grid" class="items-grid"></div>
     </section>
@@ -75,17 +75,17 @@
     <!-- DATA TAB -->
     <section id="tab-data" class="tab-panel">
       <div class="card">
-        <h2>Backup &amp; återställning</h2>
-        <p>All data sparas lokalt i webbläsaren. Exportera regelbundet om du vill spara historiken.</p>
+        <h2>Backup &amp; restore</h2>
+        <p>All data is stored locally in the browser. Export regularly if you want to keep history.</p>
         <div class="button-row">
-          <button id="btn-export">Exportera JSON</button>
-          <button id="btn-import">Importera JSON</button>
+          <button id="btn-export">Export JSON</button>
+          <button id="btn-import">Import JSON</button>
           <input type="file" id="import-file" accept="application/json" style="display:none">
-          <button id="btn-reset" class="danger">Återställ till default</button>
+          <button id="btn-reset" class="danger">Reset to default</button>
         </div>
       </div>
       <div class="card">
-        <h2>Statistik</h2>
+        <h2>Statistics</h2>
         <div id="data-stats"></div>
       </div>
     </section>
@@ -95,39 +95,39 @@
   <div id="bundle-modal" class="modal hidden">
     <div class="modal-content">
       <header>
-        <h2 id="bundle-modal-title">Ny bundle</h2>
+        <h2 id="bundle-modal-title">New bundle</h2>
         <button class="icon-btn" id="bundle-modal-close">&times;</button>
       </header>
       <form id="bundle-form">
         <div class="form-row">
-          <label>Namn<input type="text" name="name" required></label>
-          <label>Typ
+          <label>Name<input type="text" name="name" required></label>
+          <label>Type
             <select name="type" required>
               <option value="shop">Shop (SEK)</option>
-              <option value="gem-pack">Gem-paket (SEK)</option>
+              <option value="gem-pack">Gem pack (SEK)</option>
               <option value="trader">Trader (gems)</option>
             </select>
           </label>
         </div>
         <div class="form-row">
-          <label>Pris (SEK) <span class="muted small">— lämna tom för trader</span><input type="number" name="priceSEK" step="0.01" min="0"></label>
-          <label>Datum<input type="date" name="dateAdded"></label>
+          <label>Price (SEK) <span class="muted small">— leave empty for trader</span><input type="number" name="priceSEK" step="0.01" min="0"></label>
+          <label>Date<input type="date" name="dateAdded"></label>
         </div>
         <div class="form-row">
-          <label class="checkbox"><input type="checkbox" name="active" checked> Aktiv i shop</label>
-          <label class="checkbox"><input type="checkbox" name="purchased"> Köpt av mig</label>
+          <label class="checkbox"><input type="checkbox" name="active" checked> Active in shop</label>
+          <label class="checkbox"><input type="checkbox" name="purchased"> Purchased by me</label>
         </div>
         <fieldset class="contents-fieldset">
-          <legend>Innehåll</legend>
+          <legend>Contents</legend>
           <div id="bundle-contents-rows"></div>
-          <button type="button" id="btn-add-content-row">+ Lägg till item</button>
-          <p class="muted small">Tips: för trader-bundles, lägg till "Gem" med <em>negativt</em> antal som kostnad.</p>
+          <button type="button" id="btn-add-content-row">+ Add item</button>
+          <p class="muted small">Tip: for trader bundles, add "Gem" with a <em>negative</em> quantity as the cost.</p>
         </fieldset>
-        <label>Anteckningar<textarea name="notes" rows="2"></textarea></label>
+        <label>Notes<textarea name="notes" rows="2"></textarea></label>
         <div class="button-row">
-          <button type="submit" class="primary">Spara</button>
-          <button type="button" id="btn-delete-bundle" class="danger" style="display:none">Ta bort</button>
-          <button type="button" id="btn-cancel-bundle">Avbryt</button>
+          <button type="submit" class="primary">Save</button>
+          <button type="button" id="btn-delete-bundle" class="danger" style="display:none">Delete</button>
+          <button type="button" id="btn-cancel-bundle">Cancel</button>
         </div>
       </form>
     </div>

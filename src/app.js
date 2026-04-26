@@ -36,7 +36,7 @@ function saveState() {
 }
 
 function resetToDefault() {
-  if (!confirm('Återställ all data till default? Allt eget innehåll försvinner.')) return;
+  if (!confirm('Reset all data to default? All your changes will be lost.')) return;
   state.bundles = SEED_BUNDLES.map(b => structuredClone(b));
   state.valuation = null;
   saveState();
@@ -118,7 +118,7 @@ function renderBundles() {
   });
 
   if (filtered.length === 0) {
-    list.innerHTML = '<p class="muted">Inga bundles matchade.</p>';
+    list.innerHTML = '<p class="muted">No bundles matched.</p>';
     return;
   }
 
@@ -153,13 +153,13 @@ function bundleCardHTML(b, values) {
       </div>
       <div class="bundle-card-meta">
         <span class="tag ${b.type}">${b.type}</span>
-        ${b.active ? '' : '<span class="tag">inaktiv</span>'}
-        ${b.purchased ? '<span class="tag purchased">köpt</span>' : ''}
+        ${b.active ? '' : '<span class="tag">inactive</span>'}
+        ${b.purchased ? '<span class="tag purchased">purchased</span>' : ''}
         ${b.dateAdded ? `<span>${b.dateAdded}</span>` : ''}
       </div>
       <div class="bundle-card-contents">${chips}</div>
       <div class="bundle-card-score">
-        <span class="muted">Värde: ${fmtSEK(score.itemValue)}</span>
+        <span class="muted">Value: ${fmtSEK(score.itemValue)}</span>
         <span class="${scoreClass}">${fmtScore(score.score)}</span>
       </div>
     </div>
@@ -176,11 +176,11 @@ function renderValuation() {
   const status = document.getElementById('valuation-status');
 
   if (!state.valuation || Object.keys(state.valuation.values).length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="muted">Klicka "Räkna om värdering".</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="muted">Click "Recompute valuation".</td></tr>';
     status.textContent = '';
   } else {
     const { values, equationsUsed, perItemCount } = state.valuation;
-    status.textContent = `${equationsUsed} bundles användes för värderingen.`;
+    status.textContent = `${equationsUsed} bundles used for valuation.`;
     const rows = ITEMS
       .filter(i => values[i.id] !== undefined)
       .map(i => ({ item: i, value: values[i.id], count: perItemCount[i.id] || 0 }))
@@ -208,7 +208,7 @@ function renderValuation() {
     .sort((a, b) => b.score - a.score);
 
   if (scored.length === 0) {
-    stbody.innerHTML = '<tr><td colspan="4" class="muted">Inget att visa än.</td></tr>';
+    stbody.innerHTML = '<tr><td colspan="4" class="muted">Nothing to show yet.</td></tr>';
   } else {
     stbody.innerHTML = scored.map(x => {
       const cls = x.score >= 1 ? 'score-good' : 'score-bad';
@@ -273,12 +273,12 @@ function renderDataStats() {
     trader: state.bundles.filter(b => b.type === 'trader').length,
   };
   stats.innerHTML = `
-    <div class="stat"><div class="stat-value">${total}</div><div class="stat-label">Bundles totalt</div></div>
-    <div class="stat"><div class="stat-value">${active}</div><div class="stat-label">Aktiva</div></div>
-    <div class="stat"><div class="stat-value">${purchased}</div><div class="stat-label">Köpta</div></div>
-    <div class="stat"><div class="stat-value">${totalSpent} kr</div><div class="stat-label">Total summa köpt</div></div>
+    <div class="stat"><div class="stat-value">${total}</div><div class="stat-label">Total bundles</div></div>
+    <div class="stat"><div class="stat-value">${active}</div><div class="stat-label">Active</div></div>
+    <div class="stat"><div class="stat-value">${purchased}</div><div class="stat-label">Purchased</div></div>
+    <div class="stat"><div class="stat-value">${totalSpent} kr</div><div class="stat-label">Total spent</div></div>
     <div class="stat"><div class="stat-value">${types.shop}</div><div class="stat-label">Shop</div></div>
-    <div class="stat"><div class="stat-value">${types['gem-pack']}</div><div class="stat-label">Gem-paket</div></div>
+    <div class="stat"><div class="stat-value">${types['gem-pack']}</div><div class="stat-label">Gem packs</div></div>
     <div class="stat"><div class="stat-value">${types.trader}</div><div class="stat-label">Trader</div></div>
   `;
 }
@@ -292,7 +292,7 @@ function openBundleModal(bundleId) {
   state.ui.editingBundleId = bundleId;
 
   const bundle = bundleId ? state.bundles.find(b => b.id === bundleId) : null;
-  titleEl.textContent = bundle ? 'Redigera bundle' : 'Ny bundle';
+  titleEl.textContent = bundle ? 'Edit bundle' : 'New bundle';
   deleteBtn.style.display = bundle ? '' : 'none';
 
   form.elements.name.value = bundle?.name ?? '';
@@ -326,7 +326,7 @@ function addContentRow(content = { itemId: ITEMS[0].id, qty: 1 }) {
   row.innerHTML = `
     <select class="content-item">${options}</select>
     <input type="number" class="content-qty" step="any" value="${content.qty}">
-    <button type="button" class="icon-btn content-remove" title="Ta bort">×</button>
+    <button type="button" class="icon-btn content-remove" title="Remove">×</button>
   `;
   row.querySelector('.content-remove').addEventListener('click', () => row.remove());
   rowsContainer.appendChild(row);
@@ -356,8 +356,8 @@ function readBundleForm() {
 function saveBundleFromForm(e) {
   e.preventDefault();
   const data = readBundleForm();
-  if (!data.name) { alert('Namn krävs.'); return; }
-  if (data.contents.length === 0) { alert('Lägg till minst ett item.'); return; }
+  if (!data.name) { alert('Name is required.'); return; }
+  if (data.contents.length === 0) { alert('Add at least one item.'); return; }
 
   if (state.ui.editingBundleId) {
     const bundle = state.bundles.find(b => b.id === state.ui.editingBundleId);
@@ -373,7 +373,7 @@ function saveBundleFromForm(e) {
 
 function deleteCurrentBundle() {
   if (!state.ui.editingBundleId) return;
-  if (!confirm('Ta bort denna bundle?')) return;
+  if (!confirm('Delete this bundle?')) return;
   state.bundles = state.bundles.filter(b => b.id !== state.ui.editingBundleId);
   saveState();
   recomputeValuation();
@@ -400,14 +400,14 @@ function importJSON(file) {
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data.bundles)) throw new Error('Felaktigt format.');
-      if (!confirm(`Importera ${data.bundles.length} bundles? Befintlig data ersätts.`)) return;
+      if (!Array.isArray(data.bundles)) throw new Error('Invalid format.');
+      if (!confirm(`Import ${data.bundles.length} bundles? Existing data will be replaced.`)) return;
       state.bundles = data.bundles;
       saveState();
       recomputeValuation();
       renderAll();
     } catch (err) {
-      alert('Kunde inte läsa filen: ' + err.message);
+      alert('Could not read file: ' + err.message);
     }
   };
   reader.readAsText(file);
