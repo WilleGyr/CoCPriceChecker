@@ -3,138 +3,565 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoC Price Checker</title>
-  <link rel="stylesheet" href="style.css">
+  <title>CoC Price Checker — Math beats marketing</title>
+  <meta name="description" content="A data-driven valuation tool for Clash of Clans bundles. Estimate per-item SEK value via least-squares regression.">
+  <meta property="og:title" content="CoC Price Checker">
+  <meta property="og:description" content="Discover the true price of every Clash of Clans item — backed by math, not vibes.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="images/Icon_HV_Resource_Gem.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0e13;
+      --bg-soft: #11151c;
+      --surface: #161b24;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #e9eef5;
+      --text-muted: #8b95a5;
+      --accent: #f5a623;
+      --accent-soft: rgba(245,166,35,0.12);
+      --gem: #b794f4;
+      --good: #3fb950;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Subtle radial gradient backdrop */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(245,166,35,0.12), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(183,148,244,0.08), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main, header, footer { position: relative; z-index: 1; }
+
+    /* Nav */
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 32px 64px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 76px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      max-width: 14ch;
+      margin-inline: auto;
+    }
+
+    h1 .grad {
+      background: linear-gradient(135deg, var(--accent) 0%, #ff7eb6 50%, var(--gem) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .lead {
+      font-size: clamp(17px, 1.5vw, 20px);
+      color: var(--text-muted);
+      max-width: 56ch;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b0e13;
+      box-shadow: 0 4px 24px rgba(245,166,35,0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(245,166,35,0.35);
+    }
+
+    .btn-ghost {
+      color: var(--text);
+      border-color: var(--border-strong);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* Demo / preview block */
+    .preview {
+      max-width: 1100px;
+      margin: 80px auto 0;
+      padding: 0 32px;
+    }
+
+    .preview-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
+    }
+
+    .preview-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .preview-dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .preview-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .preview-card-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .preview-card-title { font-weight: 600; font-size: 14px; }
+    .preview-card-price { color: var(--accent); font-weight: 600; font-size: 14px; }
+
+    .preview-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+
+    .preview-score {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .preview-score-good { color: var(--good); font-weight: 600; }
+
+    .preview-muted { color: var(--text-muted); font-size: 13px; }
+
+    @media (max-width: 700px) {
+      .preview-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Features */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 120px 32px 80px;
+    }
+
+    .section-eyebrow {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 56px;
+      max-width: 18ch;
+      margin-inline: auto;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .feature {
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: all 0.2s;
+    }
+
+    .feature:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+
+    .feature h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    /* Math section */
+    .math {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 32px;
+    }
+
+    .math-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 56px 48px;
+      text-align: center;
+    }
+
+    .math h2 {
+      font-size: clamp(26px, 3.5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .math p {
+      color: var(--text-muted);
+      max-width: 60ch;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .equation {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 15px;
+      color: var(--text);
+      display: inline-block;
+      max-width: 100%;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .equation .var { color: var(--accent); font-weight: 500; }
+    .equation .op { color: var(--text-muted); }
+
+    /* Final CTA */
+    .final-cta {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 32px 120px;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .final-cta p {
+      color: var(--text-muted);
+      font-size: 17px;
+      margin-bottom: 36px;
+      max-width: 50ch;
+      margin-inline: auto;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 32px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    .footer-disclaimer {
+      max-width: 60ch;
+      margin: 12px auto 0;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero > * { animation: fadeUp 0.8s ease both; }
+    .hero > *:nth-child(1) { animation-delay: 0.05s; }
+    .hero > *:nth-child(2) { animation-delay: 0.15s; }
+    .hero > *:nth-child(3) { animation-delay: 0.25s; }
+    .hero > *:nth-child(4) { animation-delay: 0.35s; }
+  </style>
 </head>
 <body>
   <header>
-    <h1>CoC Price Checker</h1>
-    <nav class="tabs">
-      <button class="tab active" data-tab="bundles">Bundles</button>
-      <button class="tab" data-tab="valuation">Valuation</button>
-      <button class="tab" data-tab="items">Items</button>
-      <button class="tab" data-tab="data">Data</button>
+    <nav>
+      <div class="nav-brand">🏰 CoC Price Checker</div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#math">How it works</a>
+        <a href="https://github.com/WilleGyr/CoCPriceChecker" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
     </nav>
   </header>
 
   <main>
-    <!-- BUNDLES TAB -->
-    <section id="tab-bundles" class="tab-panel active">
-      <div class="toolbar">
-        <button id="btn-new-bundle" class="primary">+ New bundle</button>
-        <input type="search" id="search-bundles" placeholder="Search by name or item...">
-        <select id="filter-type">
-          <option value="all">All types</option>
-          <option value="shop">Shop</option>
-          <option value="gem-pack">Gem pack</option>
-          <option value="trader">Trader</option>
-        </select>
-        <select id="filter-status">
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="purchased">Purchased</option>
-        </select>
-      </div>
-      <div id="bundles-list"></div>
-    </section>
-
-    <!-- VALUATION TAB -->
-    <section id="tab-valuation" class="tab-panel">
-      <div class="toolbar">
-        <button id="btn-recalc" class="primary">Recompute valuation</button>
-        <span id="valuation-status" class="muted"></span>
-      </div>
-      <div class="valuation-grid">
-        <div class="card">
-          <h2>Estimated value per item (SEK)</h2>
-          <table id="item-values-table">
-            <thead><tr><th></th><th>Item</th><th class="num">Value</th><th class="num">Per</th><th class="num">Bundles</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="card">
-          <h2>Deal score per bundle</h2>
-          <p class="muted small">Value in SEK / price. &gt; 1.0 = good deal. For trader: item value / SEK value of gem cost.</p>
-          <table id="bundle-scores-table">
-            <thead><tr><th>Bundle</th><th class="num">Price</th><th class="num">Value</th><th class="num">Score</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
+    <section class="hero">
+      <div class="badge"><span class="badge-dot"></span>Open source · Zero dependencies</div>
+      <h1>Math beats <span class="grad">marketing</span>.</h1>
+      <p class="lead">A data-driven valuation tool for Clash of Clans bundles, gem packs, and trader items. Stop guessing whether that 199 kr offer is a deal — let least-squares regression tell you.</p>
+      <div class="cta-row">
+        <a href="app.html" class="btn btn-primary">Launch app →</a>
+        <a href="https://github.com/WilleGyr/CoCPriceChecker" class="btn btn-ghost" target="_blank" rel="noopener">View source</a>
       </div>
     </section>
 
-    <!-- ITEMS TAB -->
-    <section id="tab-items" class="tab-panel">
-      <div class="toolbar">
-        <input type="search" id="search-items" placeholder="Search items...">
-      </div>
-      <div id="items-grid" class="items-grid"></div>
-    </section>
-
-    <!-- DATA TAB -->
-    <section id="tab-data" class="tab-panel">
-      <div class="card">
-        <h2>Backup &amp; restore</h2>
-        <p>All data is stored locally in the browser. Export regularly if you want to keep history.</p>
-        <div class="button-row">
-          <button id="btn-export">Export JSON</button>
-          <button id="btn-import">Import JSON</button>
-          <input type="file" id="import-file" accept="application/json" style="display:none">
-          <button id="btn-reset" class="danger">Reset to default</button>
+    <section class="preview">
+      <div class="preview-frame">
+        <div class="preview-bar">
+          <span class="preview-dot"></span>
+          <span class="preview-dot"></span>
+          <span class="preview-dot"></span>
+        </div>
+        <div class="preview-grid">
+          <div class="preview-card">
+            <span class="preview-tag">Shop</span>
+            <div class="preview-card-head">
+              <div class="preview-card-title">Battle boost</div>
+              <div class="preview-card-price">13 kr</div>
+            </div>
+            <div class="preview-muted">2× Power potion · 2× Research potion · 1× Resource potion</div>
+            <div class="preview-score">
+              <span class="preview-muted">Value: 17 kr</span>
+              <span class="preview-score-good">1.34×</span>
+            </div>
+          </div>
+          <div class="preview-card">
+            <span class="preview-tag" style="background:rgba(183,148,244,0.12);color:var(--gem)">Gem pack</span>
+            <div class="preview-card-head">
+              <div class="preview-card-title">Storage of Gems</div>
+              <div class="preview-card-price">2795 kr</div>
+            </div>
+            <div class="preview-muted">30 000× Gem</div>
+            <div class="preview-score">
+              <span class="preview-muted">Value: 2 847 kr</span>
+              <span class="preview-score-good">1.02×</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <h2>Statistics</h2>
-        <div id="data-stats"></div>
+    </section>
+
+    <section class="features" id="features">
+      <div class="section-eyebrow">What it does</div>
+      <h2 class="section-title">Every item, fairly priced.</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature-icon">📊</div>
+          <h3>Estimated SEK value per item</h3>
+          <p>Ridge least-squares regression across every bundle in your library. The more data, the sharper the estimate.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🎯</div>
+          <h3>Deal score per bundle</h3>
+          <p>One number tells you if it's a steal or a trap. Above 1.0× and you're winning. Below it and Supercell is.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🕒</div>
+          <h3>Bundle history</h3>
+          <p>Track active offers, archive expired ones, mark what you bought. Spot patterns over months.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔌</div>
+          <h3>Zero dependencies</h3>
+          <p>No npm, no build, no backend. ~1500 lines of vanilla JS. Open <code>app.html</code> and you're running.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">💾</div>
+          <h3>Local-first data</h3>
+          <p>Everything saved in <code>localStorage</code>. Export to JSON anytime. Your data, your machine.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🌑</div>
+          <h3>Dark mode by default</h3>
+          <p>Designed for late-night Town Hall planning. Tabular numerics. Reads like a Bloomberg terminal for clashers.</p>
+        </div>
       </div>
+    </section>
+
+    <section class="math" id="math">
+      <div class="math-wrap">
+        <div class="section-eyebrow">The math</div>
+        <h2>30 bundles. One linear system.</h2>
+        <p>Each bundle is one equation. Trader prices link gems to items. Gem packs anchor gems to kronor. With enough bundles, the system is overdetermined — and we solve it the way every regression problem gets solved.</p>
+        <div class="equation">
+          <span class="var">3</span> <span class="op">·</span> price(<span class="var">Builder Potion</span>) <span class="op">+</span> <span class="var">20</span> <span class="op">·</span> price(<span class="var">Wall Ring</span>) <span class="op">=</span> <span class="var">65 kr</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <h2>Ready to know what your gems are worth?</h2>
+      <p>The app loads instantly. No signup, no analytics, no nonsense.</p>
+      <a href="app.html" class="btn btn-primary">Launch app →</a>
     </section>
   </main>
 
-  <!-- Bundle add/edit modal -->
-  <div id="bundle-modal" class="modal hidden">
-    <div class="modal-content">
-      <header>
-        <h2 id="bundle-modal-title">New bundle</h2>
-        <button class="icon-btn" id="bundle-modal-close">&times;</button>
-      </header>
-      <form id="bundle-form">
-        <div class="form-row">
-          <label>Name<input type="text" name="name" required></label>
-          <label>Type
-            <select name="type" required>
-              <option value="shop">Shop (SEK)</option>
-              <option value="gem-pack">Gem pack (SEK)</option>
-              <option value="trader">Trader (gems)</option>
-            </select>
-          </label>
-        </div>
-        <div class="form-row">
-          <label>Price (SEK) <span class="muted small">— leave empty for trader</span><input type="number" name="priceSEK" step="0.01" min="0"></label>
-          <label>Date<input type="date" name="dateAdded"></label>
-        </div>
-        <div class="form-row">
-          <label class="checkbox"><input type="checkbox" name="active" checked> Active in shop</label>
-          <label class="checkbox"><input type="checkbox" name="purchased"> Purchased by me</label>
-        </div>
-        <fieldset class="contents-fieldset">
-          <legend>Contents</legend>
-          <div id="bundle-contents-rows"></div>
-          <button type="button" id="btn-add-content-row">+ Add item</button>
-          <p class="muted small">Tip: for trader bundles, add "Gem" with a <em>negative</em> quantity as the cost.</p>
-        </fieldset>
-        <label>Notes<textarea name="notes" rows="2"></textarea></label>
-        <div class="button-row">
-          <button type="submit" class="primary">Save</button>
-          <button type="button" id="btn-delete-bundle" class="danger" style="display:none">Delete</button>
-          <button type="button" id="btn-cancel-bundle">Cancel</button>
-        </div>
-      </form>
+  <footer>
+    <div>
+      <a href="https://github.com/WilleGyr/CoCPriceChecker" target="_blank" rel="noopener">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/WilleGyr/CoCPriceChecker/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      &nbsp;·&nbsp;
+      <a href="app.html">Launch app</a>
     </div>
-  </div>
-
-  <script src="src/data.js"></script>
-  <script src="src/regression.js"></script>
-  <script src="src/app.js"></script>
+    <p class="footer-disclaimer">All Clash of Clans item icons © Supercell. This project is not affiliated with, endorsed by, or sponsored by Supercell.</p>
+  </footer>
 </body>
 </html>
