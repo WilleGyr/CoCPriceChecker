@@ -48,8 +48,8 @@ function resetToDefault() {
 function fmtSEK(n) {
   if (n == null || !isFinite(n)) return '–';
   if (n === 0) return '0 kr';
-  if (n < 0.01) return (n * 100).toFixed(2) + ' öre';
-  if (n < 1)    return (n * 100).toFixed(1) + ' öre';
+  if (n < 0.01) return n.toFixed(4) + ' kr';
+  if (n < 1)    return n.toFixed(3) + ' kr';
   if (n < 10)   return n.toFixed(2) + ' kr';
   return n.toFixed(0) + ' kr';
 }
